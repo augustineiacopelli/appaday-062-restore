@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Restore - AppADay 062</title>
+<meta name="description" content="A guided stretching and prayer app. Cool down the body, quiet the mind, lift the heart. He restores my soul - Psalm 23:3">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Karla:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#20242e;
+  --dusk:#2a3040;
+  --panel:#323949;
+  --mist:#e8eae4;
+  --mist-dim:#aab0ac;
+  --sage:#9db8a0;
+  --sage-deep:#6f8f74;
+  --gold:#d9b36a;
+  --gold-soft:rgba(217,179,106,0.16);
+  --line:rgba(232,234,228,0.12);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{height:100%}
+body{
+  min-height:100dvh;
+  background:var(--ink);
+  color:var(--mist);
+  font-family:'Karla',sans-serif;
+  font-weight:300;
+  display:flex;
+  flex-direction:column;
+  background-image:radial-gradient(ellipse 120% 60% at 50% -10%, #2c3346 0%, var(--ink) 60%);
+}
+h1,h2,h3,.display{font-family:'Marcellus',serif;font-weight:400}
+button{font-family:'Karla',sans-serif;cursor:pointer;border:none;background:none;color:inherit}
+a{color:inherit}
+
+/* Header bar */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;border-bottom:1px solid var(--line);
+  font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:var(--mist-dim);
+}
+.topbar .brand{font-family:'Marcellus',serif;font-size:14px;letter-spacing:0.22em;color:var(--mist)}
+.topbar a{text-decoration:none;transition:color .2s}
+.topbar a:hover{color:var(--gold)}
+.topbar button{font-size:16px;color:var(--mist-dim);padding:4px 8px}
+.topbar button:hover{color:var(--mist)}
+
+/* Layout */
+.view{flex:1;display:none;flex-direction:column;width:100%;max-width:680px;margin:0 auto;padding:0 20px 40px}
+.view.active{display:flex}
+
+/* Home */
+.hero{padding:36px 0 8px;text-align:center}
+.hero h1{font-size:44px;letter-spacing:0.08em;color:var(--mist)}
+.hero .verse{font-family:'Marcellus',serif;font-style:normal;color:var(--gold);font-size:16px;margin-top:8px;letter-spacing:0.04em}
+.hero .verse span{color:var(--mist-dim);font-family:'Karla',sans-serif;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;display:block;margin-top:4px}
+
+.section-label{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--mist-dim);margin:30px 0 12px}
+
+.routine{
+  width:100%;text-align:left;background:var(--dusk);border:1px solid var(--line);
+  border-radius:14px;padding:18px 20px;margin-bottom:12px;
+  display:flex;align-items:center;gap:16px;transition:border-color .2s, transform .15s;
+}
+.routine:hover{border-color:var(--sage)}
+.routine:active{transform:scale(0.99)}
+.routine .r-icon{width:44px;height:44px;flex:none;border-radius:50%;background:var(--gold-soft);display:flex;align-items:center;justify-content:center}
+.routine .r-icon svg{width:26px;height:26px}
+.routine .r-name{font-family:'Marcellus',serif;font-size:19px;color:var(--mist)}
+.routine .r-meta{font-size:13px;color:var(--mist-dim);margin-top:2px}
+.routine .r-go{margin-left:auto;color:var(--sage);font-size:20px}
+
+.stats{display:flex;gap:10px;margin-top:4px}
+.stat{flex:1;background:var(--dusk);border:1px solid var(--line);border-radius:14px;padding:14px 8px;text-align:center}
+.stat .n{font-family:'Marcellus',serif;font-size:26px;color:var(--gold)}
+.stat .l{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--mist-dim);margin-top:2px}
+
+.dots{display:grid;grid-template-columns:repeat(14,1fr);gap:6px;background:var(--dusk);border:1px solid var(--line);border-radius:14px;padding:16px}
+.dot{aspect-ratio:1;border-radius:50%;background:rgba(232,234,228,0.08)}
+.dot.on{background:var(--sage)}
+.dot.today{outline:1px solid var(--gold);outline-offset:1px}
+
+.library-link{width:100%;text-align:center;margin-top:26px;padding:14px;border:1px solid var(--line);border-radius:14px;color:var(--mist-dim);font-size:13px;letter-spacing:0.1em;text-transform:uppercase;transition:color .2s,border-color .2s}
+.library-link:hover{color:var(--mist);border-color:var(--sage)}
+
+/* Library */
+.lib-head{padding:26px 0 4px;text-align:center}
+.lib-head h2{font-size:28px;letter-spacing:0.06em}
+.lib-head p{color:var(--mist-dim);font-size:14px;margin-top:6px}
+.card{
+  width:100%;text-align:left;background:var(--dusk);border:1px solid var(--line);border-radius:14px;
+  padding:14px 16px;margin-top:12px;display:flex;align-items:center;gap:14px;transition:border-color .2s;
+}
+.card:hover{border-color:var(--sage)}
+.card .thumb{width:78px;height:60px;flex:none;background:var(--panel);border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.card .thumb svg{width:100%;height:100%}
+.card .c-name{font-family:'Marcellus',serif;font-size:17px}
+.card .c-meta{font-size:12.5px;color:var(--mist-dim);margin-top:2px}
+
+/* Detail */
+.detail{padding-top:20px;text-align:center}
+.detail .figure-wrap{position:relative;width:min(78vw,300px);margin:14px auto 6px}
+.detail h2{font-size:26px;letter-spacing:0.05em;margin-top:6px}
+.detail .d-meta{color:var(--sage);font-size:13px;letter-spacing:0.12em;text-transform:uppercase;margin-top:4px}
+.detail .how{color:var(--mist);font-size:15.5px;line-height:1.65;margin:18px auto 0;max-width:440px;text-align:left}
+.scripture{margin:22px auto 0;max-width:440px;background:var(--gold-soft);border:1px solid rgba(217,179,106,0.3);border-radius:14px;padding:18px 20px}
+.scripture .s-verse{font-family:'Marcellus',serif;font-size:17px;line-height:1.55;color:var(--gold)}
+.scripture .s-ref{font-size:11.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--mist-dim);margin-top:8px}
+.back-row{margin:26px 0 0}
+.btn{
+  display:inline-block;padding:14px 34px;border-radius:999px;font-size:13px;letter-spacing:0.14em;
+  text-transform:uppercase;font-weight:600;transition:transform .15s, background .2s;
+}
+.btn:active{transform:scale(0.97)}
+.btn-primary{background:var(--sage);color:var(--ink)}
+.btn-primary:hover{background:var(--sage-deep);color:var(--mist)}
+.btn-ghost{border:1px solid var(--line);color:var(--mist-dim)}
+.btn-ghost:hover{color:var(--mist);border-color:var(--mist-dim)}
+
+/* Session */
+.session{align-items:center;text-align:center;padding-top:10px}
+.progress-row{width:100%;display:flex;align-items:center;justify-content:space-between;padding:12px 0 4px;font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:var(--mist-dim)}
+.progress-track{width:100%;height:2px;background:rgba(232,234,228,0.1);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:var(--sage);width:0%;transition:width .5s ease}
+
+.halo-wrap{position:relative;width:min(74vw,320px);aspect-ratio:1;margin:18px auto 4px;display:flex;align-items:center;justify-content:center}
+.halo{
+  position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle, rgba(217,179,106,0.18) 0%, rgba(217,179,106,0.05) 55%, transparent 72%);
+  transform:scale(0.82);
+  transition:transform 4s ease-in-out;
+}
+.halo.inhale{transform:scale(1.02)}
+.halo.exhale{transition-duration:6s;transform:scale(0.82)}
+@media (prefers-reduced-motion: reduce){
+  .halo{transition:none !important;transform:scale(0.92) !important}
+}
+.ring{position:absolute;inset:0;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:3}
+.ring .track{stroke:rgba(232,234,228,0.1)}
+.ring .left{stroke:var(--sage);stroke-linecap:round;transition:stroke-dashoffset .25s linear}
+.pose-stage{width:62%;height:62%;display:flex;align-items:center;justify-content:center}
+.pose-stage svg{width:100%;height:100%}
+
+.s-count{font-family:'Marcellus',serif;font-size:40px;color:var(--mist);line-height:1;margin-top:2px}
+.s-name{font-family:'Marcellus',serif;font-size:24px;margin-top:8px;letter-spacing:0.04em}
+.s-cue{font-size:13px;letter-spacing:0.18em;text-transform:uppercase;color:var(--sage);margin-top:8px;min-height:18px}
+.s-cue.switch{color:var(--gold)}
+.s-prayer{font-family:'Marcellus',serif;color:var(--gold);font-size:17px;margin-top:14px;min-height:24px}
+.s-how{color:var(--mist-dim);font-size:14px;line-height:1.6;margin:12px auto 0;max-width:420px}
+.s-controls{display:flex;gap:12px;margin-top:24px}
+
+/* Done */
+.done{align-items:center;text-align:center;justify-content:center}
+.done .amen{font-family:'Marcellus',serif;font-size:34px;color:var(--gold);margin-top:10px}
+.done .glory{font-family:'Marcellus',serif;font-size:18px;line-height:1.7;color:var(--mist);max-width:400px;margin:22px auto 0}
+.done .d-stats{color:var(--mist-dim);font-size:14px;margin-top:20px}
+.done .btn{margin-top:28px}
+
+.footer{padding:20px;text-align:center;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(170,176,172,0.5)}
+.footer a{text-decoration:none}
+.footer a:hover{color:var(--gold)}
+
+@media(min-width:600px){
+  .hero h1{font-size:54px}
+  .dots{grid-template-columns:repeat(28,1fr)}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="https://augustineiacopelli.github.io/appaday/">&larr; AppADay</a>
+  <div class="brand">RESTORE &middot; 062</div>
+  <button id="soundBtn" aria-label="Toggle sound" title="Toggle chime">&#9836;</button>
+</header>
+
+<!-- HOME -->
+<main class="view active" id="view-home">
+  <div class="hero">
+    <h1>Restore</h1>
+    <div class="verse">&ldquo;He restores my soul.&rdquo;<span>Psalm 23:3</span></div>
+  </div>
+
+  <div class="section-label">Begin a session</div>
+  <div id="routineList"></div>
+
+  <div class="section-label">Your practice</div>
+  <div class="stats">
+    <div class="stat"><div class="n" id="statStreak">0</div><div class="l">Day streak</div></div>
+    <div class="stat"><div class="n" id="statSessions">0</div><div class="l">Sessions</div></div>
+    <div class="stat"><div class="n" id="statMinutes">0</div><div class="l">Minutes</div></div>
+  </div>
+
+  <div class="section-label">Last 28 days</div>
+  <div class="dots" id="dotGrid"></div>
+
+  <button class="library-link" id="libraryBtn">Browse all stretches &rarr;</button>
+</main>
+
+<!-- LIBRARY -->
+<main class="view" id="view-library">
+  <div class="lib-head">
+    <h2>Stretch Library</h2>
+    <p>Tap any stretch to learn it, or hold it on its own.</p>
+  </div>
+  <div id="libList"></div>
+  <div class="back-row" style="text-align:center"><button class="btn btn-ghost" data-nav="home">Back home</button></div>
+</main>
+
+<!-- DETAIL -->
+<main class="view" id="view-detail">
+  <div class="detail">
+    <div class="figure-wrap" id="detailFig"></div>
+    <h2 id="detailName"></h2>
+    <div class="d-meta" id="detailMeta"></div>
+    <p class="how" id="detailHow"></p>
+    <div class="scripture">
+      <div class="s-verse" id="detailVerse"></div>
+      <div class="s-ref" id="detailRef"></div>
+    </div>
+    <div class="back-row">
+      <button class="btn btn-primary" id="holdBtn">Hold this stretch</button>
+      &nbsp;
+      <button class="btn btn-ghost" data-nav="library">Back</button>
+    </div>
+  </div>
+</main>
+
+<!-- SESSION -->
+<main class="view session" id="view-session">
+  <div class="progress-row"><span id="sessTitle"></span><span id="sessStep"></span></div>
+  <div class="progress-track"><div class="progress-fill" id="sessFill"></div></div>
+
+  <div class="halo-wrap">
+    <div class="halo" id="halo"></div>
+    <svg class="ring" viewBox="0 0 100 100">
+      <circle class="track" cx="50" cy="50" r="47"></circle>
+      <circle class="left" id="ringLeft" cx="50" cy="50" r="47"></circle>
+    </svg>
+    <div class="pose-stage" id="poseStage"></div>
+  </div>
+
+  <div class="s-count" id="sCount">30</div>
+  <div class="s-name" id="sName"></div>
+  <div class="s-cue" id="sCue">Breathe in</div>
+  <div class="s-prayer" id="sPrayer"></div>
+  <p class="s-how" id="sHow"></p>
+
+  <div class="s-controls">
+    <button class="btn btn-ghost" id="pauseBtn">Pause</button>
+    <button class="btn btn-ghost" id="skipBtn">Next</button>
+    <button class="btn btn-ghost" id="quitBtn">End</button>
+  </div>
+</main>
+
+<!-- DONE -->
+<main class="view done" id="view-done">
+  <div class="amen">Well done.</div>
+  <div class="glory">Glory be to the Father, and to the Son, and to the Holy Spirit: as it was in the beginning, is now, and ever shall be, world without end. Amen.</div>
+  <div class="d-stats" id="doneStats"></div>
+  <button class="btn btn-primary" data-nav="home">Return home</button>
+</main>
+
+<footer class="footer"><a href="https://augustineiacopelli.github.io/appaday/">AppADay 062 &middot; Restore &middot; by Augustine Iacopelli</a></footer>
+
+<script>
+"use strict";
+
+/* ---------- Pose illustrations (silhouette pictograms) ---------- */
+var POSES = {
+  fold: "<svg viewBox=\"0 0 220 170\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\"><line x1=\"24\" y1=\"153\" x2=\"196\" y2=\"153\" stroke=\"rgba(232,234,228,0.18)\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M100,152 L102,98\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M112,152 L106,98\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M104,100 C102,110 94,118 86,122\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M96,108 L88,142\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M101,112 L94,144\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M86,122 L81,127\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"79\" cy=\"129\" r=\"10\" fill=\"#e8eae4\"/></svg>",
+  quad: "<svg viewBox=\"0 0 220 170\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\"><line x1=\"24\" y1=\"153\" x2=\"196\" y2=\"153\" stroke=\"rgba(232,234,228,0.18)\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M100,60 L100,102\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100,102 L96,152\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100,102 L114,124\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M114,124 C118,112 112,102 105,98\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100,68 L70,72\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100,66 C112,76 114,90 107,99\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"100\" cy=\"45\" r=\"10\" fill=\"#e8eae4\"/></svg>",
+  hamstring: "<svg viewBox=\"0 0 220 170\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\"><line x1=\"24\" y1=\"153\" x2=\"196\" y2=\"153\" stroke=\"rgba(232,234,228,0.18)\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M90,146 L156,148\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M92,141 L152,144\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M90,142 C96,126 106,116 118,110\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M108,120 L146,142\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M104,124 L140,145\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M118,110 L123,105\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"126\" cy=\"102\" r=\"10\" fill=\"#e8eae4\"/></svg>",
+  child: "<svg viewBox=\"0 0 220 170\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\"><line x1=\"24\" y1=\"153\" x2=\"196\" y2=\"153\" stroke=\"rgba(232,234,228,0.18)\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M66,148 L96,148\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M72,147 L88,128\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M88,128 C100,116 116,120 126,132\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M112,124 L156,145\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M108,128 L150,148\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M126,132 L131,137\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"133\" cy=\"139\" r=\"9\" fill=\"#e8eae4\"/></svg>",
+  catcow: "<svg viewBox=\"0 0 220 170\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\"><line x1=\"24\" y1=\"153\" x2=\"196\" y2=\"153\" stroke=\"rgba(232,234,228,0.18)\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M78,150 L80,114\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M134,150 L132,113\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M80,113 Q106,90 132,113\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M80,113 L73,123\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"69\" cy=\"130\" r=\"9\" fill=\"#e8eae4\"/></svg>",
+  twist: "<svg viewBox=\"0 0 220 170\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\"><line x1=\"24\" y1=\"153\" x2=\"196\" y2=\"153\" stroke=\"rgba(232,234,228,0.18)\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M100,141 C86,150 72,150 64,144\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100,141 C114,150 128,150 136,144\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100,143 L100,97\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100,107 L127,114\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100,110 L80,125\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"100\" cy=\"83\" r=\"10\" fill=\"#e8eae4\"/></svg>",
+  chest: "<svg viewBox=\"0 0 220 170\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\"><line x1=\"24\" y1=\"153\" x2=\"196\" y2=\"153\" stroke=\"rgba(232,234,228,0.18)\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M99,58 L99,102\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M99,102 L93,152\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M99,102 L107,152\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M99,64 C86,80 85,100 94,112\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M102,64 C115,80 116,100 98,112\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"96\" cy=\"113\" r=\"5\" fill=\"#e8eae4\"/><circle cx=\"103\" cy=\"43\" r=\"10\" fill=\"#e8eae4\"/></svg>",
+  neck: "<svg viewBox=\"0 0 220 170\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\"><line x1=\"24\" y1=\"153\" x2=\"196\" y2=\"153\" stroke=\"rgba(232,234,228,0.18)\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M100,60 L100,104\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100,104 L94,152\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100,104 L108,152\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100,68 C114,56 116,50 110,46\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100,70 L96,104\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"108\" cy=\"47\" r=\"10\" fill=\"#e8eae4\"/></svg>",
+  lunge: "<svg viewBox=\"0 0 220 170\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\"><line x1=\"24\" y1=\"153\" x2=\"196\" y2=\"153\" stroke=\"rgba(232,234,228,0.18)\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M78,152 L80,127\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M80,127 L102,117\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M102,117 L154,150\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M102,117 L99,70\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M99,78 L87,46\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M99,78 L112,46\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"98\" cy=\"55\" r=\"10\" fill=\"#e8eae4\"/></svg>",
+  butterfly: "<svg viewBox=\"0 0 220 170\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\"><line x1=\"24\" y1=\"153\" x2=\"196\" y2=\"153\" stroke=\"rgba(232,234,228,0.18)\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M100,143 L100,99\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100,141 Q72,126 63,143\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100,141 Q128,126 137,143\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M63,143 Q80,151 98,146\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M137,143 Q120,151 102,146\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100,109 L73,139\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100,109 L127,139\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"100\" cy=\"85\" r=\"10\" fill=\"#e8eae4\"/></svg>",
+  figfour: "<svg viewBox=\"0 0 220 170\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\"><line x1=\"24\" y1=\"153\" x2=\"196\" y2=\"153\" stroke=\"rgba(232,234,228,0.18)\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M50,142 L98,141\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M98,141 L112,106\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M112,106 L98,88\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M97,138 L126,127\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M126,127 L108,112\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M62,140 L90,118\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"38\" cy=\"139\" r=\"10\" fill=\"#e8eae4\"/></svg>",
+  wall: "<svg viewBox=\"0 0 220 170\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\"><line x1=\"24\" y1=\"153\" x2=\"196\" y2=\"153\" stroke=\"rgba(232,234,228,0.18)\" stroke-width=\"3\" stroke-linecap=\"round\"/><line x1=\"146\" y1=\"44\" x2=\"146\" y2=\"152\" stroke=\"rgba(232,234,228,0.3)\" stroke-width=\"4\" stroke-linecap=\"round\"/><path d=\"M60,143 L124,142\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M124,142 L137,76\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M121,142 L132,74\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M92,143 L102,150\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"48\" cy=\"141\" r=\"10\" fill=\"#e8eae4\"/></svg>",
+  seatside: "<svg viewBox=\"0 0 220 170\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\"><line x1=\"24\" y1=\"153\" x2=\"196\" y2=\"153\" stroke=\"rgba(232,234,228,0.18)\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M100,141 C86,150 72,150 64,144\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100,141 C114,150 128,150 136,144\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100,143 C104,120 112,104 123,94\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M106,113 C120,97 134,89 146,87\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M102,121 L84,136\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M123,94 L128,88\" fill=\"none\" stroke=\"#e8eae4\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"131\" cy=\"85\" r=\"10\" fill=\"#e8eae4\"/></svg>"
+};
+
+/* ---------- Stretch data ---------- */
+var STRETCHES = [
+  { id:"fold", name:"Standing Forward Fold", area:"Hamstrings and back", secs:30, sides:false,
+    how:"Stand with feet hip-width apart. Hinge at the hips and fold forward, letting your head and arms hang heavy. Keep a soft bend in the knees and release the neck completely.",
+    verse:"Be still, and know that I am God.", ref:"Psalm 46:10", prayer:"Be still, my soul." },
+  { id:"quad", name:"Standing Quad Stretch", area:"Quadriceps", secs:40, sides:true,
+    how:"Stand tall, bend one knee, and draw your heel toward your seat, holding the ankle behind you. Keep knees close together and hips square. Use a wall for balance if needed.",
+    verse:"The Lord is my strength and my shield; in him my heart trusts.", ref:"Psalm 28:7", prayer:"Lord, You are my strength." },
+  { id:"hamstring", name:"Seated Hamstring Reach", area:"Hamstrings", secs:40, sides:false,
+    how:"Sit with legs extended in front of you. Hinge forward from the hips with a long spine, reaching toward your feet. Go only as far as the breath stays easy.",
+    verse:"They that hope in the Lord shall renew their strength.", ref:"Isaiah 40:31", prayer:"Renew me, Lord." },
+  { id:"lunge", name:"Low Lunge", area:"Hip flexors", secs:40, sides:true,
+    how:"Step one foot forward into a lunge, back knee lowered to the floor. Sink the hips gently forward and lift through the chest. Reach the arms up if it feels good.",
+    verse:"Be strong and courageous; the Lord your God is with you wherever you go.", ref:"Joshua 1:9", prayer:"With You I go forward." },
+  { id:"butterfly", name:"Butterfly", area:"Hips and inner thighs", secs:45, sides:false,
+    how:"Sit tall and bring the soles of your feet together, knees falling open. Hold your feet and let gravity do the work. Fold gently forward to deepen.",
+    verse:"Under his wings you will find refuge.", ref:"Psalm 91:4", prayer:"Shelter me, Lord." },
+  { id:"twist", name:"Seated Twist", area:"Spine", secs:40, sides:true,
+    how:"Sit cross-legged with a tall spine. Place one hand on the opposite knee and rotate gently from the waist, looking over your shoulder. Lengthen on the inhale, twist on the exhale.",
+    verse:"Lord, you have searched me and you know me.", ref:"Psalm 139:1", prayer:"You know me, Lord." },
+  { id:"child", name:"Child's Pose", area:"Back, hips, and shoulders", secs:45, sides:false,
+    how:"Kneel and sit back on your heels, then fold forward with arms extended and forehead resting toward the floor. Let the whole back body soften.",
+    verse:"Come to me, all you who labor and are burdened, and I will give you rest.", ref:"Matthew 11:28", prayer:"Jesus, I come to You." },
+  { id:"catcow", name:"Cat and Cow", area:"Spine", secs:45, sides:false,
+    how:"On hands and knees, arch the back upward as you exhale, tucking the chin. Then let the belly drop and lift the gaze as you inhale. Move slowly with each breath.",
+    verse:"Create in me a clean heart, O God, and renew a right spirit within me.", ref:"Psalm 51:10", prayer:"Create in me a clean heart." },
+  { id:"chest", name:"Chest Opener", area:"Chest and shoulders", secs:30, sides:false,
+    how:"Stand tall and clasp your hands behind your back. Draw the shoulder blades together, lift the chest, and raise the knuckles gently away from you.",
+    verse:"Let us lift up our hearts and hands to God in heaven.", ref:"Lamentations 3:41", prayer:"Lift up my heart, O Lord." },
+  { id:"neck", name:"Neck Release", area:"Neck", secs:30, sides:true,
+    how:"Sit or stand tall. Tilt one ear toward the shoulder, letting the opposite shoulder stay heavy. Rest a hand lightly on the head for a little extra weight, never pulling.",
+    verse:"My yoke is easy, and my burden light.", ref:"Matthew 11:30", prayer:"I rest in You." },
+  { id:"seatside", name:"Seated Side Bend", area:"Side body", secs:40, sides:true,
+    how:"Sit cross-legged. Ground one hand beside you and reach the other arm up and over, arcing to the side. Keep both sitting bones heavy and breathe into the ribs.",
+    verse:"My soul rests in God alone, from whom comes my salvation.", ref:"Psalm 62:1", prayer:"In You alone I rest." },
+  { id:"figfour", name:"Reclined Figure Four", area:"Glutes and hips", secs:40, sides:true,
+    how:"Lie on your back and cross one ankle over the opposite knee. Draw the lower thigh gently toward your chest until you feel the stretch in the outer hip.",
+    verse:"Cast all your anxiety on him, because he cares for you.", ref:"1 Peter 5:7", prayer:"I cast my cares on You." },
+  { id:"wall", name:"Legs Up the Wall", area:"Full recovery", secs:60, sides:false,
+    how:"Lie on your back with your seat near a wall and rest your legs straight up against it. Let the arms fall open, close your eyes, and simply breathe.",
+    verse:"Peace I leave with you; my peace I give to you.", ref:"John 14:27", prayer:"Jesus, I trust in You." }
+];
+var BY_ID = {};
+STRETCHES.forEach(function(s){ BY_ID[s.id] = s; });
+
+/* ---------- Routines ---------- */
+var ROUTINES = [
+  { key:"cooldown", name:"Post-Workout Cooldown", desc:"Ease the body down after effort",
+    ids:["fold","quad","hamstring","lunge","figfour","butterfly","child","wall"] },
+  { key:"evening", name:"Evening Calm", desc:"Quiet the mind before rest",
+    ids:["catcow","child","twist","neck","seatside","wall"] },
+  { key:"reset", name:"Quick Reset", desc:"Four stretches, a few minutes",
+    ids:["neck","chest","fold","child"] }
+];
+function routineMinutes(r){
+  var t = 0;
+  r.ids.forEach(function(id){ t += BY_ID[id].secs; });
+  return Math.max(1, Math.round(t / 60));
+}
+
+/* ---------- Storage ---------- */
+var KEY = "restore-062-data";
+function loadData(){
+  try{
+    var raw = localStorage.getItem(KEY);
+    if(raw){ var d = JSON.parse(raw); if(d && Array.isArray(d.sessions)) return d; }
+  }catch(e){}
+  return { sessions: [], sound: true };
+}
+function saveData(){ try{ localStorage.setItem(KEY, JSON.stringify(DATA)); }catch(e){} }
+var DATA = loadData();
+
+function todayStr(d){
+  d = d || new Date();
+  var m = String(d.getMonth()+1).padStart(2,"0");
+  var day = String(d.getDate()).padStart(2,"0");
+  return d.getFullYear() + "-" + m + "-" + day;
+}
+function calcStreak(){
+  var days = {};
+  DATA.sessions.forEach(function(s){ days[s.d] = true; });
+  var streak = 0;
+  var cur = new Date();
+  if(!days[todayStr(cur)]){ cur.setDate(cur.getDate()-1); }
+  while(days[todayStr(cur)]){
+    streak++;
+    cur.setDate(cur.getDate()-1);
+  }
+  return streak;
+}
+function renderStats(){
+  var totalMin = 0;
+  DATA.sessions.forEach(function(s){ totalMin += s.m; });
+  document.getElementById("statStreak").textContent = calcStreak();
+  document.getElementById("statSessions").textContent = DATA.sessions.length;
+  document.getElementById("statMinutes").textContent = totalMin;
+
+  var days = {};
+  DATA.sessions.forEach(function(s){ days[s.d] = true; });
+  var grid = document.getElementById("dotGrid");
+  grid.innerHTML = "";
+  var start = new Date();
+  start.setDate(start.getDate() - 27);
+  for(var i = 0; i < 28; i++){
+    var d = new Date(start);
+    d.setDate(start.getDate() + i);
+    var ds = todayStr(d);
+    var el = document.createElement("div");
+    el.className = "dot" + (days[ds] ? " on" : "") + (ds === todayStr() ? " today" : "");
+    el.title = ds;
+    grid.appendChild(el);
+  }
+}
+
+/* ---------- Navigation ---------- */
+var VIEWS = ["home","library","detail","session","done"];
+function show(v){
+  VIEWS.forEach(function(x){
+    document.getElementById("view-" + x).classList.toggle("active", x === v);
+  });
+  window.scrollTo(0,0);
+}
+document.querySelectorAll("[data-nav]").forEach(function(b){
+  b.addEventListener("click", function(){
+    stopTimer();
+    show(b.getAttribute("data-nav"));
+    if(b.getAttribute("data-nav") === "home") renderStats();
+  });
+});
+document.getElementById("libraryBtn").addEventListener("click", function(){ show("library"); });
+
+/* ---------- Home render ---------- */
+var candle = '<svg viewBox="0 0 24 24" fill="none"><path d="M12 3c1.6 2 2.6 3.4 2.6 5A2.6 2.6 0 0 1 12 10.6 2.6 2.6 0 0 1 9.4 8c0-1.6 1-3 2.6-5z" fill="#d9b36a"/><rect x="10.4" y="11.5" width="3.2" height="8" rx="1.4" fill="#9db8a0"/></svg>';
+function renderRoutines(){
+  var wrap = document.getElementById("routineList");
+  wrap.innerHTML = "";
+  ROUTINES.forEach(function(r){
+    var b = document.createElement("button");
+    b.className = "routine";
+    b.innerHTML = '<div class="r-icon">' + candle + '</div>' +
+      '<div><div class="r-name">' + r.name + '</div>' +
+      '<div class="r-meta">' + r.ids.length + ' stretches &middot; about ' + routineMinutes(r) + ' min &middot; ' + r.desc + '</div></div>' +
+      '<div class="r-go">&rarr;</div>';
+    b.addEventListener("click", function(){ startSession(r); });
+    wrap.appendChild(b);
+  });
+}
+
+/* ---------- Library render ---------- */
+function renderLibrary(){
+  var wrap = document.getElementById("libList");
+  wrap.innerHTML = "";
+  STRETCHES.forEach(function(s){
+    var b = document.createElement("button");
+    b.className = "card";
+    b.innerHTML = '<div class="thumb">' + POSES[s.id] + '</div>' +
+      '<div><div class="c-name">' + s.name + '</div>' +
+      '<div class="c-meta">' + s.area + ' &middot; ' + s.secs + 's' + (s.sides ? ' &middot; both sides' : '') + '</div></div>';
+    b.addEventListener("click", function(){ showDetail(s); });
+    wrap.appendChild(b);
+  });
+}
+var detailStretch = null;
+function showDetail(s){
+  detailStretch = s;
+  document.getElementById("detailFig").innerHTML = POSES[s.id];
+  document.getElementById("detailName").textContent = s.name;
+  document.getElementById("detailMeta").textContent = s.area + " - hold " + s.secs + "s" + (s.sides ? ", each cue switches sides halfway" : "");
+  document.getElementById("detailHow").textContent = s.how;
+  document.getElementById("detailVerse").textContent = '"' + s.verse + '"';
+  document.getElementById("detailRef").textContent = s.ref;
+  show("detail");
+}
+document.getElementById("holdBtn").addEventListener("click", function(){
+  if(detailStretch){
+    startSession({ key:"single", name:detailStretch.name, ids:[detailStretch.id] });
+  }
+});
+
+/* ---------- Sound ---------- */
+var audioCtx = null;
+function chime(freq){
+  if(!DATA.sound) return;
+  try{
+    if(!audioCtx){
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if(!AC) return;
+      audioCtx = new AC();
+    }
+    if(audioCtx.state === "suspended") audioCtx.resume();
+    var o = audioCtx.createOscillator();
+    var g = audioCtx.createGain();
+    o.type = "sine";
+    o.frequency.value = freq || 523.25;
+    g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.18, audioCtx.currentTime + 0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.4);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start();
+    o.stop(audioCtx.currentTime + 1.5);
+  }catch(e){}
+}
+function renderSoundBtn(){
+  document.getElementById("soundBtn").textContent = DATA.sound ? "\u266B" : "\u266A";
+  document.getElementById("soundBtn").style.opacity = DATA.sound ? "1" : "0.4";
+}
+document.getElementById("soundBtn").addEventListener("click", function(){
+  DATA.sound = !DATA.sound;
+  saveData();
+  renderSoundBtn();
+  if(DATA.sound) chime(659.25);
+});
+
+/* ---------- Session engine ---------- */
+var RING_C = 2 * Math.PI * 47;
+document.getElementById("ringLeft").setAttribute("stroke-dasharray", RING_C.toFixed(2));
+
+var sess = null;
+var timerId = null;
+var breathId = null;
+
+function startSession(routine){
+  sess = {
+    routine: routine,
+    idx: 0,
+    remaining: BY_ID[routine.ids[0]].secs,
+    paused: false,
+    startedAt: Date.now(),
+    totalSecs: 0,
+    switched: false
+  };
+  routine.ids.forEach(function(id){ sess.totalSecs += BY_ID[id].secs; });
+  document.getElementById("sessTitle").textContent = routine.name;
+  show("session");
+  loadStretch();
+  startTimer();
+  startBreath();
+  chime(523.25);
+}
+
+function currentStretch(){ return BY_ID[sess.routine.ids[sess.idx]]; }
+
+function loadStretch(){
+  var s = currentStretch();
+  sess.remaining = s.secs;
+  sess.switched = false;
+  document.getElementById("poseStage").innerHTML = POSES[s.id];
+  document.getElementById("sName").textContent = s.name;
+  document.getElementById("sPrayer").textContent = s.prayer;
+  document.getElementById("sHow").textContent = s.how;
+  document.getElementById("sessStep").textContent = (sess.idx + 1) + " of " + sess.routine.ids.length;
+  updateTick();
+}
+
+function updateTick(){
+  var s = currentStretch();
+  document.getElementById("sCount").textContent = Math.ceil(sess.remaining);
+  var frac = sess.remaining / s.secs;
+  document.getElementById("ringLeft").setAttribute("stroke-dashoffset", (RING_C * (1 - frac)).toFixed(2));
+  var done = 0;
+  for(var i = 0; i < sess.idx; i++){ done += BY_ID[sess.routine.ids[i]].secs; }
+  done += (s.secs - sess.remaining);
+  document.getElementById("sessFill").style.width = ((done / sess.totalSecs) * 100).toFixed(1) + "%";
+}
+
+function startTimer(){
+  stopTimerOnly();
+  timerId = setInterval(function(){
+    if(!sess || sess.paused) return;
+    sess.remaining -= 0.1;
+    var s = currentStretch();
+    if(s.sides && !sess.switched && sess.remaining <= s.secs / 2){
+      sess.switched = true;
+      flashCue("Switch sides", true);
+      chime(587.33);
+    }
+    if(sess.remaining <= 0){
+      nextStretch();
+    } else {
+      updateTick();
+    }
+  }, 100);
+}
+function stopTimerOnly(){ if(timerId){ clearInterval(timerId); timerId = null; } }
+function stopBreath(){ if(breathId){ clearTimeout(breathId); breathId = null; } }
+function stopTimer(){ stopTimerOnly(); stopBreath(); }
+
+function nextStretch(){
+  if(sess.idx < sess.routine.ids.length - 1){
+    sess.idx++;
+    loadStretch();
+    chime(523.25);
+  } else {
+    finishSession();
+  }
+}
+
+function finishSession(){
+  stopTimer();
+  var mins = Math.max(1, Math.round((Date.now() - sess.startedAt) / 60000));
+  DATA.sessions.push({ d: todayStr(), r: sess.routine.key, m: mins });
+  saveData();
+  document.getElementById("doneStats").textContent =
+    sess.routine.name + " complete - " + mins + " minute" + (mins === 1 ? "" : "s") + " - streak: " + calcStreak() + " day" + (calcStreak() === 1 ? "" : "s");
+  chime(783.99);
+  show("done");
+  renderStats();
+  sess = null;
+}
+
+/* Breath cue loop: inhale 4s, exhale 6s */
+var cueLocked = false;
+function flashCue(text, gold){
+  var el = document.getElementById("sCue");
+  cueLocked = true;
+  el.textContent = text;
+  el.classList.toggle("switch", !!gold);
+  setTimeout(function(){ cueLocked = false; el.classList.remove("switch"); }, 2500);
+}
+function startBreath(){
+  stopBreath();
+  var halo = document.getElementById("halo");
+  function inhale(){
+    if(!sess) return;
+    halo.classList.remove("exhale");
+    halo.classList.add("inhale");
+    if(!cueLocked) document.getElementById("sCue").textContent = "Breathe in";
+    breathId = setTimeout(exhale, 4000);
+  }
+  function exhale(){
+    if(!sess) return;
+    halo.classList.remove("inhale");
+    halo.classList.add("exhale");
+    if(!cueLocked) document.getElementById("sCue").textContent = "Breathe out";
+    breathId = setTimeout(inhale, 6000);
+  }
+  inhale();
+}
+
+/* Controls */
+document.getElementById("pauseBtn").addEventListener("click", function(){
+  if(!sess) return;
+  sess.paused = !sess.paused;
+  this.textContent = sess.paused ? "Resume" : "Pause";
+});
+document.getElementById("skipBtn").addEventListener("click", function(){
+  if(!sess) return;
+  nextStretch();
+});
+document.getElementById("quitBtn").addEventListener("click", function(){
+  if(!sess) return;
+  var elapsed = (Date.now() - sess.startedAt) / 60000;
+  if(elapsed >= 1){
+    finishSession();
+  } else {
+    stopTimer();
+    sess = null;
+    show("home");
+    renderStats();
+  }
+});
+
+/* ---------- Init ---------- */
+renderRoutines();
+renderLibrary();
+renderStats();
+renderSoundBtn();
+</script>
+</body>
+</html>
